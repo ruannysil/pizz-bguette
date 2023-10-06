@@ -1,4 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
+
+'use client'
+
 import { OrderItemProps } from "@/app/dashboard/page";
 import { useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
@@ -36,11 +39,11 @@ export default function ModalOrder({
     const calculateTotalPrice = order.reduce((total, item) => {
       const itemTotal = item.amount * parseFloat(item.product.price);
       return total + itemTotal;
-    }, 0)
-    setTotalPrice(calculateTotalPrice)
-  }, [order])
+    }, 0);
+    setTotalPrice(calculateTotalPrice);
+  }, [order]);
 
-  console.log()
+  console.log();
 
   const customStyles = {
     overlay: {
