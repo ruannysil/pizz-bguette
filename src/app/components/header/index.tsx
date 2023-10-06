@@ -27,7 +27,7 @@ export default function Header() {
   function handleSignOut() {
     signOut(auth)
       .then(() => {
-        console.log("Usuario desconectado");
+        // console.log("Usuario desconectado");
       })
       .catch((error) => {
         console.log("Error ao desconnectar o usuario:", error);
@@ -60,7 +60,7 @@ export default function Header() {
             Cardápio
           </Link>
           <Link
-            href={"/"}
+            href={"/dashboard"}
             className="hover:text-bgred text-white transition-colors duration-500"
           >
             Últimos Pedidos

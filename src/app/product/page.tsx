@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import Header from "../components/header";
 import Image from "next/image";
 import { addDoc, collection, getDocs } from "firebase/firestore";
@@ -28,7 +28,8 @@ export default function Product() {
     { id: 3, name: "Grande" },
   ];
 
-  async function handleRegister() {
+  async function handleRegister(e: FormEvent) {
+    e.preventDefault();
     if (!nameProduct || !price || !description) {
       toast.error("Porfavor preencha todos os campos");
       return;
@@ -54,8 +55,6 @@ export default function Product() {
         .catch((error) => {
           toast.error("Error ao registra", error);
         });
-
-      toast.success("Product added successfully!");
       setAvatarUrl("");
       setImageAvatar(null);
       setNameProduct("");
@@ -136,7 +135,7 @@ export default function Product() {
       <Header />
       <div className="flex flex-col items-center justify-center md:mt-8 mt-9">
         <div className="flex flex-col justify-center md:w-[600px] w-[100%]">
-          <form onSubmit={handleRegister} className="flex flex-col gap-2">
+          <form onSubmit={handleRegister} className="flex flex-col gap-2 px-5 mb-8">
             <h1 className="text-2xl font-bold text-white">
               Cadastrar novo Produto
             </h1>

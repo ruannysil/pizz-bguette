@@ -6,6 +6,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebaseConnection";
 import Header from "../components/header";
 import { LiaSpinnerSolid } from "react-icons/lia";
+import { toast } from "react-toastify";
 
 export default function Category() {
     const [category, setCategory] = useState("");
@@ -19,7 +20,7 @@ export default function Category() {
           name: category,
         });
   
-        console.log("registrado com sucesso!");
+        toast.success("registrado com sucesso!");
       } catch (err) {
         console.log("Erro ao registrar ", err);
       } finally {

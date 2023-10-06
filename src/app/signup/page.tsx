@@ -1,22 +1,20 @@
-'use client'
+"use client";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { LiaSpinnerSolid } from "react-icons/lia";
 import { FormEvent, useState, useEffect } from "react";
 import {
   UserCredential,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "@/app/firebaseConnection";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import logo from "../../public/logo.png";
+import logo from "../../../public/logo.png";
 import Link from "next/link";
 import { toast } from "react-toastify";
 
-export default function Home() {
-  const [user, setUser] = useState(false);
+export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,57 +23,45 @@ export default function Home() {
   const handleClick = () => setShow(!show);
   const router = useRouter();
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // console.log(user);
-      } else {
-        setUser(false);
-      }
-    });
-  }, []);
-
-  async function handlesignIn(e: FormEvent) {
+  async function handleRegister(e: FormEvent) {
     e.preventDefault();
 
     if (email === "" || password === "") {
       return;
     }
 
+    const userCredential: UserCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userCredential.user;
+
     try {
-      setLoading(true);
-
-      const userCredential: UserCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
       if (user) {
-        // console.log("Sucesso ao fazer login!", user);
-        toast.success("Sucesso ao fazer login!")
+        console.log("Sucesso ao cadastra usuario!", user);
+        toast.success("Sucesso ao cadastra usuario!");
         setEmail("");
         setPassword("");
-        router.push("/dashboard");
+        router.push("/");
       } else {
-        console.log("Error ao criar usuario!");
-        toast.error("Erro ao fazer login!")
+        console.log("Erro ao criar uma conta!");
+        toast.error("Erro ao criar uma conta!");
       }
     } catch (err) {
       console.log("Erro ao criar uma conta ", err);
-    } finally {
+
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-[100vh]" >
+    <div className="flex flex-col items-center justify-center h-[100vh]">
       <div className="mb-9">
         <Image src={logo} alt="logo" className="md:w-[300px] w-[200px]" />
       </div>
       <form
-        onSubmit={handlesignIn}
+        onSubmit={handleRegister}
         className="flex flex-col md:w-[600px] w-[85%] gap-2 items-center justify-center"
       >
         <input
