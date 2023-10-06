@@ -8,6 +8,7 @@ import { db, storage } from "../firebaseConnection";
 import { FiUpload } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import React from "react";
 
 export default function Product() {
   const [nameProduct, setNameProduct] = useState("");

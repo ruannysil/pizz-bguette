@@ -54,7 +54,7 @@ export default function Header() {
             Produtos
           </Link>
           <Link
-            href={"/"}
+            href={"/menu"}
             className="hover:text-bgred text-white transition-colors duration-500"
           >
             Cardápio

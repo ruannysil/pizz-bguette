@@ -1,26 +1,46 @@
 /* eslint-disable @next/next/no-img-element */
 
-'use client'
+"use client";
 
-import { OrderItemProps } from "@/app/dashboard/page";
+import React from "react";
 import { useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import ReactModal from "react-modal";
-import logo from "@/../../public/logo.png";
 
-interface ModalOrderProps {
-  isOpen: boolean;
-  onRequestClose: () => void;
-  order: OrderItemProps[];
+export interface ModalOrderProps {
+  order: OrderDataSnapshot[];
   handleFinishOrder: (id: string) => void;
+  isOpen: boolean;
+  onRequestClose: () => void | any;
 }
 
+interface OrderDataSnapshot {
+  id: string;
+  amount: number;
+  order_id: string;
+  product_id: string;
+  product: ProductProps;
+  order: {
+    id: string;
+    table: string | number;
+    status: boolean;
+    name: string | null;
+  };
+}
+type ProductProps = {
+  id: string;
+  categoryId: string;
+  nameProduct: string;
+  description: string;
+  price: string;
+  imageAvatar: string;
+};
 export default function ModalOrder({
-  isOpen,
   onRequestClose,
   order,
   handleFinishOrder,
-}: ModalOrderProps) {
+  isOpen,
+}: any) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [totalPrice, setTotalPrice] = useState(0);
 
@@ -70,10 +90,16 @@ export default function ModalOrder({
   };
 
   // console.log(order)
+
+  const handleClose = () => {
+    if (typeof onRequestClose === "function") {
+      onRequestClose();
+    }
+  };
   return (
     <ReactModal
       isOpen={isOpen}
-      onRequestClose={onRequestClose}
+      onRequestClose={() => handleClose()}
       style={customStyles}
     >
       <button
@@ -126,3 +152,4 @@ export default function ModalOrder({
     </ReactModal>
   );
 }
+

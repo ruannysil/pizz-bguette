@@ -3,7 +3,7 @@
 import { FiRefreshCcw } from "react-icons/fi";
 import Header from "../components/header";
 import { useEffect, useState } from "react";
-import ModalOrder from "../components/modalOrder/page";
+import ModalOrder from "../components/modalOrder";
 import {
   collection,
   doc,
@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebaseConnection";
 import Modal from "react-modal";
+import React from "react";
 
 export type ProductProps = {
   id: string;
@@ -33,7 +34,7 @@ export type CategoryProps = {
 
 export type OrderItemProps = {
   id: string;
-  amount: number;
+  amount: number ;
   order_id: string;
   product_id: string;
   product: ProductProps;
@@ -54,7 +55,7 @@ export default function Dashboard() {
       name: string;
     }[]
   >([]);
-  const [modalItem, setModalItem] = useState<OrderItemProps[]>([]);
+  const [modalItem, setModalItem] = useState<OrderDataSnapshot[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<CategoryProps[]>([]);
@@ -65,7 +66,7 @@ export default function Dashboard() {
       // Busque todas as categorias
       const categoriesCollection = collection(db, "categories");
       const categoriesSnapshot = await getDocs(categoriesCollection);
-      const categoriesData:any = categoriesSnapshot.docs.map((doc) => ({
+      const categoriesData: any = categoriesSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
@@ -74,7 +75,7 @@ export default function Dashboard() {
       // Busque todos os produtos
       const productsCollection = collection(db, "products");
       const productsSnapshot = await getDocs(productsCollection);
-      const productsData:any = productsSnapshot.docs.map((doc) => ({
+      const productsData: any = productsSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
@@ -84,11 +85,24 @@ export default function Dashboard() {
     fetchCategoriesAndProducts();
   }, []);
 
-
   Modal.setAppElement("#next");
 
   function OpenModal(itemData: any) {
     setModalItem(itemData);
+  }
+
+  interface OrderDataSnapshot {
+    id: string;
+    amount: number;
+    order_id: string;
+    product_id: string;
+    product: ProductProps;
+    order: {
+      id: string;
+      table: string | number;
+      status: boolean;
+      name: string | null;
+    };
   }
 
   async function handleOpenModalView(id: string) {
@@ -97,9 +111,24 @@ export default function Dashboard() {
       const orderDocSnapshot = await getDoc(orderDocRef);
 
       if (orderDocSnapshot.exists()) {
-        const orderData = orderDocSnapshot.data();
-        OpenModal(orderData);
-        setModalVisible(true);
+        const orderDataSnapshot = orderDocSnapshot.data() as OrderDataSnapshot;
+        if (orderDataSnapshot) {
+          const orderData: OrderItemProps = {
+            id: orderDataSnapshot.id,
+            amount: orderDataSnapshot.amount,
+            order_id: orderDataSnapshot.order_id,
+            product_id: orderDataSnapshot.product_id,
+            product: orderDataSnapshot.product,
+            order: {
+              id: orderDataSnapshot.order.id,
+              table: orderDataSnapshot.order.table,
+              status: orderDataSnapshot.order.status,
+              name: orderDataSnapshot.order.name  ,
+            },
+          };
+          OpenModal(orderData);
+          setModalVisible(true);
+        }
       } else {
         console.log("pedido nao encontrado");
       }
@@ -138,23 +167,22 @@ export default function Dashboard() {
   }
 
   async function handleFinishItem(id: string) {
-   try {
-    const orderDocRef = doc(db, "order", id);
-    const orderDocSnapshot = await getDoc(orderDocRef);
+    try {
+      const orderDocRef = doc(db, "order", id);
+      const orderDocSnapshot = await getDoc(orderDocRef);
 
-    if(orderDocSnapshot.exists()) {
-      await updateDoc(orderDocRef, {
-        status: false
-      });
+      if (orderDocSnapshot.exists()) {
+        await updateDoc(orderDocRef, {
+          status: false,
+        });
 
-      setModalVisible(false);
-
-    } else {
-      console.log('Pedido nao encontrado');
+        setModalVisible(false);
+      } else {
+        console.log("Pedido nao encontrado");
+      }
+    } catch (err) {
+      console.log("Erro ao atualizar pedidos: ", err);
     }
-   }catch(err) {
-    console.log('Erro ao atualizar pedidos: ', err)
-   }
   }
 
   async function handleRefeshOrder() {
@@ -243,5 +271,3 @@ export default function Dashboard() {
     </>
   );
 }
-
-
