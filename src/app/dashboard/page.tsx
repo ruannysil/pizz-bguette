@@ -20,11 +20,12 @@ import React from "react";
 
 export type ProductProps = {
   id: string;
+  imageAvatar: string;
   categoryId: string;
   nameProduct: string;
+  name: string;
   description: string;
   price: string;
-  imageAvatar: string;
 };
 
 export type CategoryProps = {
@@ -34,7 +35,7 @@ export type CategoryProps = {
 
 export type OrderItemProps = {
   id: string;
-  amount: number ;
+  amount: number;
   order_id: string;
   product_id: string;
   product: ProductProps;
@@ -123,7 +124,7 @@ export default function Dashboard() {
               id: orderDataSnapshot.order.id,
               table: orderDataSnapshot.order.table,
               status: orderDataSnapshot.order.status,
-              name: orderDataSnapshot.order.name  ,
+              name: orderDataSnapshot.order.name,
             },
           };
           OpenModal(orderData);

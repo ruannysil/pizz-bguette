@@ -11,7 +11,7 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React from "react";
 
 export default function Product() {
-  const [nameProduct, setNameProduct] = useState("");
+  const [nameP, setNameP] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -31,7 +31,7 @@ export default function Product() {
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();
-    if (!nameProduct || !price || !description) {
+    if (!nameP || !price || !description) {
       toast.error("Porfavor preencha todos os campos");
       return;
     }
@@ -40,6 +40,7 @@ export default function Product() {
       imageAvatar: imageAvatar,
       categoryId: categories[categorySelected].id,
       nameProduct: sizeProducts[categorySelectedPortion].name,
+      name: nameP,
       price: price,
       description: description,
     };
@@ -58,7 +59,7 @@ export default function Product() {
         });
       setAvatarUrl("");
       setImageAvatar(null);
-      setNameProduct("");
+      setNameP("");
       setPrice("");
       setDescription("");
       setCategorieSelectedPortion(-1);
@@ -136,7 +137,10 @@ export default function Product() {
       <Header />
       <div className="flex flex-col items-center justify-center md:mt-8 mt-9">
         <div className="flex flex-col justify-center md:w-[600px] w-[100%]">
-          <form onSubmit={handleRegister} className="flex flex-col gap-2 px-5 mb-8">
+          <form
+            onSubmit={handleRegister}
+            className="flex flex-col gap-2 px-5 mb-8"
+          >
             <h1 className="text-2xl font-bold text-white">
               Cadastrar novo Produto
             </h1>
@@ -193,8 +197,8 @@ export default function Product() {
 
             <input
               type="text"
-              value={nameProduct}
-              onChange={(e) => setNameProduct(e.target.value)}
+              value={nameP}
+              onChange={(e) => setNameP(e.target.value)}
               placeholder="Digite o nome do produto"
               className="text-white bg-bgdark border px-auto p-[0.9rem] rounded-md pl-4"
             />

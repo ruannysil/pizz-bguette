@@ -31,6 +31,7 @@ type ProductProps = {
   id: string;
   categoryId: string;
   nameProduct: string;
+  name: string;
   description: string;
   price: string;
   imageAvatar: string;

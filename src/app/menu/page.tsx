@@ -99,6 +99,7 @@ export default function Menu() {
 
         <div className="flex justify-between flex-col items-center w-full">
           {products.map((item) => (
+            
             <div key={item.id} className="flex w-full">
               <button
                 className="bg-colordark border border-bgred mb-2 flex w-full sm:mr-4 mr-0 rounded-md "
@@ -110,13 +111,16 @@ export default function Menu() {
                   className="w-[100px] mr-3 rounded-l-md bg-cover"
                 />
                 <div className="flex flex-col items-start justify-start w-full">
-                  <h2 className="text-white">{item.nameProduct}</h2>
-                  <p className="text-white">{item.price}</p>
-                  <p className="text-white">{item.description}</p>
+                  <p className="text-white">Nome do Produto: {item.name}</p>
+                  <h2 className="text-white">
+                    Tamanho da porção: {item.nameProduct}
+                  </h2>
+                  <p className="text-white">R$ {item.price},00</p>
                 </div>
               </button>
             </div>
           ))}
+          {/* {products.map((item) => {console.log(item)})} */}
         </div>
       </main>
     </>
