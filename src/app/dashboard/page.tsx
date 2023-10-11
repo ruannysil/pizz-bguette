@@ -16,7 +16,7 @@ type OrderProps = {
   order_id: string;
 };
 
-export interface HomeProps {
+interface HomeProps {
   orders: OrderProps[];
 }
 
