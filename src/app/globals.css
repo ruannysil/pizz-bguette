@@ -22,3 +22,10 @@ body {
   color: rgb(var(--colorWhite));
   background: var(--backgroundColor);
 }
+
+
+@media (min-width: 400px) {
+  .mm\:flex-row {
+      flex-direction: row;
+  }
+}

@@ -1,71 +1,23 @@
-/* eslint-disable @next/next/no-img-element */
-
-"use client";
-
-import React from "react";
-import { useEffect, useState } from "react";
+import { OrderItemProps } from "@/app/dashboard/page";
+import Modal from "react-modal";
 import { FiX } from "react-icons/fi";
-import ReactModal from "react-modal";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/app/firebaseConnection";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
-export interface ModalOrderProps {
-  order: OrderDataSnapshot[];
-  handleFinishOrder: (id: string) => void;
+interface ModalOrderProps {
   isOpen: boolean;
-  onRequestClose: () => void | any;
+  onRequestClose: () => void;
+  order: OrderItemProps;
 }
 
-interface OrderDataSnapshot {
-  id: string;
-  amount: number;
-  order_id: string;
-  product_id: string;
-  product: ProductProps;
-  order: {
-    id: string;
-    table: string | number;
-    status: boolean;
-    name: string | null;
-  };
-}
-type ProductProps = {
-  id: string;
-  categoryId: string;
-  nameProduct: string;
-  name: string;
-  description: string;
-  price: string;
-  imageAvatar: string;
-};
 export default function ModalOrder({
+  isOpen,
   onRequestClose,
   order,
-  handleFinishOrder,
-  isOpen,
-}: any) {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [totalPrice, setTotalPrice] = useState(0);
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowWidth(window.innerWidth);
-    }
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    const calculateTotalPrice = order.reduce((total, item) => {
-      const itemTotal = item.amount * parseFloat(item.product.price);
-      return total + itemTotal;
-    }, 0);
-    setTotalPrice(calculateTotalPrice);
-  }, [order]);
-
-  console.log();
-
+}: ModalOrderProps) {
+  const [sendOrderData, setSendOrderData] = useState([]);
   const customStyles = {
     overlay: {
       left: "5px",
@@ -85,72 +37,83 @@ export default function ModalOrder({
       width: "100%",
       maxHeight: "620px",
       height: "100%",
-      padding: `${windowWidth < 450 ? "12px" : "30px"}`,
+      padding: "30px",
+      // padding: `${windowWidth < 450 ? "12px" : "30px"}`,
       border: "1px solid #ff3f4b ",
     },
   };
 
-  // console.log(order)
-
-  const handleClose = () => {
-    if (typeof onRequestClose === "function") {
-      onRequestClose();
+  useEffect(() => {
+    async function fetchSendOrder(id: string) {
+      try {
+        const sendOrderCollection = collection(db, "send-order");
+        const q = query(sendOrderCollection, where("order_id", "==", id));
+        const sendOrderSnapshot = await getDocs(q);
+        if (!sendOrderSnapshot.empty) {
+          const sendOrders = [];
+          sendOrderSnapshot.forEach((doc) => {
+            sendOrders.push({
+              id: doc.id,
+              ...doc.data(),
+            });
+          });
+          setSendOrderData(sendOrders); // Armazena os dados no estado
+        } else {
+          console.log(
+            'Nenhum documento encontrado na coleção "send-order" com order_id',
+            id
+          );
+        }
+      } catch (error) {
+        console.error(
+          'Erro ao buscar documentos na coleção "send-order":',
+          error
+        );
+      }
     }
-  };
+    fetchSendOrder(order.order_id);
+  }, [order]);
+
   return (
-    <ReactModal
-      isOpen={isOpen}
-      onRequestClose={() => handleClose()}
-      style={customStyles}
-    >
+    <Modal isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
       <button
-        className="react-modal-close bg-transparent border-0"
         onClick={onRequestClose}
+        className="react-modal-close bg-transparent border-0 react-modal-close"
       >
         <FiX className="text-bgred text-5xl" />
       </button>
 
       <div className="flex flex-col md:w-full">
-        <h2 className="text-white font-bold text-2xl">Detalhes do pedido</h2>
-        <span className="text-white py-2 text-x1 font-bold">Mesa: {}</span>
-
-        {order.map((item) => (
-          // console.log(item.product.nameProduct),
-          // console.log(item.order.id),
-          // console.log(item.product.nameProduct),
-          // console.log(item.product.nameProduct),
-          <section key={item.id} className="py-3 text-white felx items-center">
-            {/* <img
-              src={`${logo}`}
-              alt={"logo"}
-              className="mb-1 w-[80px] rounded-md mr-4"
-            /> */}
-            <div className="flex flex-col gap-2">
-              <span className="flex">
-                {item.amount} -
-                <strong className="text-bgred ml-1">
-                  {item.product.nameProduct}
-                </strong>
+        <h2 className="text-white text-lg">Detalhes do pedido</h2>
+        <span className="text-white my-3">
+          {" "}
+          Mesa:{" "}
+          <span className="font-bold text-bgred text-lg">{order.number}</span>
+        </span>
+        {sendOrderData.map((sendOrder) => (
+          <section key={sendOrder.id} className="flex-col flex gap-4">
+            <div className="flex mm:flex-row flex-col justify-between w-full">
+              <span className="text-white flex-row ">
+                {sendOrder.amount} - {sendOrder.product[0].name}
               </span>
-              <span>R$ {item.product.price} 00</span>
-              <span>{item.product.description}</span>
-              <span>
-                Subtotal: R${""}
-                {(item.amount * parseFloat(item.product.price)).toFixed(2)}
-              </span>
+              <Image
+                src={sendOrder.product[0].imageAvatar}
+                alt="image"
+                className="w-[100px] mr-3 rounded-l-md bg-cover"
+                width={800}
+                height={800}
+              />
             </div>
+            <span className="text-white my-3">
+              Total:{" "}
+              <span className="font-bold text-bgred text-lg">
+                R$ {sendOrder.product[0].price},00
+              </span>
+            </span>
+            {/* {console.log("Detalhes do sendOrder:", sendOrder)} */}
           </section>
         ))}
-
-        <span className="text-white mt-16 font-bold">
-          Total do Pedido:{" "}
-          <strong className="text-bgred">R$ {totalPrice.toFixed(2)}</strong>
-        </span>
-        <button className="mt-16 bg-bgdark font-bold hover:bg-bggreen text-bgred hover:text-colordark p-3 rounded-md flex items-center justify-center w-[10rem]">
-          concluir pedido
-        </button>
       </div>
-    </ReactModal>
+    </Modal>
   );
 }
-

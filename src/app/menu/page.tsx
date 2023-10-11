@@ -1,7 +1,5 @@
 "use client";
-
 import Header from "../components/header";
-import Image from "next/image";
 
 import { db } from "@/app/firebaseConnection";
 import { useRouter } from "next/navigation";
@@ -10,6 +8,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { BsSearch } from "react-icons/bs";
 import { ProductProps } from "../dashboard/page";
+import Image from "next/image";
 import React from "react";
 
 export default function Menu() {
@@ -99,16 +98,17 @@ export default function Menu() {
 
         <div className="flex justify-between flex-col items-center w-full">
           {products.map((item) => (
-            
             <div key={item.id} className="flex w-full">
               <button
                 className="bg-colordark border border-bgred mb-2 flex w-full sm:mr-4 mr-0 rounded-md "
                 onClick={() => handleSearchProduct()}
               >
-                <img
+                <Image
                   src={item.imageAvatar}
                   alt="image"
                   className="w-[100px] mr-3 rounded-l-md bg-cover"
+                  width="100"
+                  height="100"
                 />
                 <div className="flex flex-col items-start justify-start w-full">
                   <p className="text-white">Nome do Produto: {item.name}</p>
