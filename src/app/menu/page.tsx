@@ -2,19 +2,17 @@
 import Header from "../components/header";
 
 import { db } from "@/app/firebaseConnection";
-import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { BsSearch } from "react-icons/bs";
-import { ProductProps } from "../dashboard/page";
 import Image from "next/image";
 import React from "react";
 
 export default function Menu() {
   const [categories, setCategories] = useState<any>([]);
   const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState<ProductProps[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [categorySelected, setCategorySelected] = useState("");
 
   async function handleSearchProduct() {

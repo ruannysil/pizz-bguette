@@ -1,4 +1,3 @@
-import { OrderItemProps } from "@/app/dashboard/page";
 import Modal from "react-modal";
 import { FiX } from "react-icons/fi";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -9,7 +8,7 @@ import Image from "next/image";
 interface ModalOrderProps {
   isOpen: boolean;
   onRequestClose: () => void;
-  order: OrderItemProps;
+  order: any;
 }
 
 export default function ModalOrder({

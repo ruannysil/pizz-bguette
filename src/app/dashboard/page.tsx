@@ -2,48 +2,16 @@
 
 import { FiRefreshCcw } from "react-icons/fi";
 import Header from "../components/header";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ModalOrder from "../components/modalOrder";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebaseConnection";
 import Modal from "react-modal";
 import React from "react";
 
-type OrderProps = {
-  draft: boolean;
-  number: string;
-  status: boolean;
-  order_id: string;
-};
-
-interface HomeProps {
-  orders: OrderProps[];
-}
-
-export type OrderItemProps = {
-  id: string;
-  amount: number;
-  order_id: string;
-  product_id: string;
-  product: {
-    id: string;
-    name: string;
-    nameProduct: string;
-    price: string;
-    categoryId: string;
-    ImageAvatar: string;
-    description: string;
-  };
-   order: {
-    id: string;
-    number: string;
-    status: boolean;
-  };
-};
-
-export default function Dashboard({ orders }: HomeProps) {
-  const [orderList, setOrderList] = useState(orders || []);
-  const [modalItem, setModalItem] = useState<OrderItemProps[]>([]);
+export default function Dashboard() {
+  const [orderList, setOrderList] = useState([]);
+  const [modalItem, setModalItem] = useState<[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -56,7 +24,7 @@ export default function Dashboard({ orders }: HomeProps) {
     try {
       const ordersCollection = collection(db, "order");
       const ordersSnapshot = await getDocs(ordersCollection);
-      const ordersData: OrderProps[] = [];
+      const ordersData: any[] = [];
       ordersSnapshot.forEach((doc) => {
         return ordersData.push({
           id: doc.id,
@@ -104,7 +72,7 @@ export default function Dashboard({ orders }: HomeProps) {
 
       if (!ordersSnapshot.empty) {
         ordersSnapshot.forEach((doc) => {
-          const data = doc.data();
+          const data: any = doc.data();
           console.log("Order data: ", data);
           setModalItem(data);
           setModalVisible(true);
