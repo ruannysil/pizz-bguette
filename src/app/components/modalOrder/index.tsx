@@ -1,6 +1,6 @@
 import Modal from "react-modal";
 import { FiX } from "react-icons/fi";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "@/app/firebaseConnection";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -9,12 +9,14 @@ interface ModalOrderProps {
   isOpen: boolean;
   onRequestClose: () => void;
   order: any;
+  fetchOrders: () => void;
 }
 
 export default function ModalOrder({
   isOpen,
   onRequestClose,
   order,
+  fetchOrders,
 }: ModalOrderProps) {
   const [sendOrderData, setSendOrderData] = useState([]);
   const customStyles = {
@@ -73,8 +75,55 @@ export default function ModalOrder({
     fetchSendOrder(order.order_id);
   }, [order]);
 
+  function calculateTotal() {
+    return sendOrderData.reduce((total, sendOrder) => {
+      const productPrice = sendOrder.product[0].price;
+      const amount = sendOrder.amount;
+      const toltalPriceForProduct = (productPrice * amount) / 1;
+      return total + toltalPriceForProduct;
+    }, 0);
+  }
+
+  async function FinishOrder() {
+    try {
+      const collection = 'order';
+      const orderId = order.order_id;
+      const docRef = doc(db, collection, orderId);
+      
+      await updateDoc(docRef, {
+        order: orderId,
+        status: true,
+      });
+      
+      const docSnapshot = await getDoc(docRef);
+      if (docSnapshot.exists()) {
+        const orderData = docSnapshot.data();
+
+        if(orderData.status === true) {
+          await deleteDoc(docRef);
+          console.log('Pedido concluido com sucesso!')
+          onRequestClose();
+        } else {
+          console.log('Erro ao concluir pedido')
+        }
+      }
+    } catch (error) {
+      console.log('erro ao atualizar seu pedido', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders])
+
+
   return (
-    <Modal isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      style={customStyles}
+      className=""
+    >
       <button
         onClick={onRequestClose}
         className="react-modal-close bg-transparent border-0 react-modal-close"
@@ -91,9 +140,12 @@ export default function ModalOrder({
         </span>
         {sendOrderData.map((sendOrder) => (
           <section key={sendOrder.id} className="flex-col flex gap-4">
-            <div className="flex mm:flex-row flex-col justify-between w-full">
+            <div className="flex mm:flex-row flex-col justify-between w-full mb-5">
               <span className="text-white flex-row ">
                 {sendOrder.amount} - {sendOrder.product[0].name}
+                <span className="text-white flex-row ml-5">
+                  R$ {sendOrder.product[0].price},00
+                </span>
               </span>
               <Image
                 src={sendOrder.product[0].imageAvatar}
@@ -103,16 +155,18 @@ export default function ModalOrder({
                 height={800}
               />
             </div>
-            <span className="text-white my-3">
-              Total:{" "}
-              <span className="font-bold text-bgred text-lg">
-                R$ {sendOrder.product[0].price},00
-              </span>
-            </span>
-            {/* {console.log("Detalhes do sendOrder:", sendOrder)} */}
           </section>
         ))}
+        <span className="text-white my-3">
+          Total:{" "}
+          <span className="font-bold text-bgred text-lg">
+            R$ {calculateTotal()},00
+          </span>
+        </span>
       </div>
+      <button className="p-3 bg-bggreen hover:bg-bgred rounded-md font-bold mt-5" onClick={FinishOrder}>
+        Concluir pedido
+      </button>
     </Modal>
   );
 }

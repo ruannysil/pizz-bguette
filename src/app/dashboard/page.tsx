@@ -127,6 +127,7 @@ export default function Dashboard() {
           isOpen={modalVisible}
           onRequestClose={handleCloseModal}
           order={modalItem}
+          fetchOrders={fetchOrders}
         />
       )}
     </>
