@@ -103,8 +103,8 @@ export default function SignUp() {
             "Acessar"
           )}
         </button>
-        <Link href="/signup" className="text-white hover:text-red-500">
-          Não possui conta? Cadastre-se
+        <Link href="/" className="text-white hover:text-red-500">
+         Já tenho uma conta? Entre aqui.
         </Link>
       </form>
     </div>
